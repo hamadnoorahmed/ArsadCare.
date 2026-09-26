@@ -1,5 +1,6 @@
 # app.py
 import streamlit as st
+st.set_page_config(initial_sidebar_state="expanded")
 import pandas as pd
 import plotly.express as px
 import folium
