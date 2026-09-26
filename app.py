@@ -1,6 +1,14 @@
 # app.py
 import streamlit as st
-st.set_page_config(initial_sidebar_state="expanded")
+
+# 1. إعدادات الصفحة (يجب استدعاؤها مرة واحدة فقط في البداية)
+st.set_page_config(
+    page_title="أرصاد-كير | ArsadCare",
+    page_icon="🌪️",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
 import pandas as pd
 import plotly.express as px
 import folium
@@ -11,28 +19,40 @@ import os
 from mock_data import CITIES_DATA
 from recommender import get_smart_recommendations
 
-# 1. إعدادات الصفحة
-st.set_page_config(
-    page_title="أرصاد-كير | ArsadCare",
-    page_icon="🌪️",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
-
-# تنسيق CSS لمنع تداخل الأرقام والرموز وضبط القوائم العربية
+# تنسيق CSS لتعريب الواجهة بدون كسر السايدبار
 st.markdown("""
     <style>
-    .stApp { direction: rtl; }
-    html, body, [class*="css"] {
-        text-align: right;
+    /* تطبيق الخط العربي والمحاذاة على النصوص والمحتوى دون كسر هيكل الصفحة */
+    html, body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+    
+    /* محاذاة الصفحة الرئيسية والسايدبار لليمين */
+    .main .block-container, section[data-testid="stSidebar"] > div {
+        direction: rtl;
+        text-align: right;
+    }
+    
+    /* حل المشكلة: إخفاء السايدبار بالكامل ومنع تسريب أي حروف عند الإغلاق */
+    section[data-testid="stSidebar"][aria-expanded="false"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
+    
+    /* منع انكماش الكلمات لحروف رأسية داخل السايدبار */
+    section[data-testid="stSidebar"] * {
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+    }
+
     div[data-testid="metric-container"] {
         background-color: #1e293b;
         border: 1px solid #334155;
         padding: 15px;
         border-radius: 10px;
         white-space: nowrap;
+        direction: rtl;
+        text-align: right;
     }
     div[data-testid="metric-container"] label {
         font-size: 0.9rem !important;
@@ -41,6 +61,8 @@ st.markdown("""
         margin-bottom: 8px;
         font-size: 1rem;
         line-height: 1.6;
+        direction: rtl;
+        text-align: right;
     }
     </style>
 """, unsafe_allow_html=True)
