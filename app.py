@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 
 # 1. إعدادات الصفحة (يجب استدعاؤها مرة واحدة فقط في البداية)
@@ -19,50 +18,86 @@ import os
 from mock_data import CITIES_DATA
 from recommender import get_smart_recommendations
 
-# تنسيق CSS لتعريب الواجهة بدون كسر السايدبار
+# ---------------------------------------------------------
+# تنسيق CSS احترافي لتعريب المحاذاة وضبط الاتجاهات والنصوص
+# ---------------------------------------------------------
 st.markdown("""
     <style>
-    /* تطبيق الخط العربي والمحاذاة على النصوص والمحتوى دون كسر هيكل الصفحة */
-    html, body {
+    /* 1. ضبط الاتجاه العام للواجهة ليكون لليمين */
+    .stApp {
+        direction: rtl;
+        text-align: right;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-    
-    /* محاذاة الصفحة الرئيسية والسايدبار لليمين */
-    .main .block-container, section[data-testid="stSidebar"] > div {
-        direction: rtl;
-        text-align: right;
-    }
-    
-    /* حل المشكلة: إخفاء السايدبار بالكامل ومنع تسريب أي حروف عند الإغلاق */
-    section[data-testid="stSidebar"][aria-expanded="false"] {
-        display: none !important;
-        visibility: hidden !important;
-    }
-    
-    /* منع انكماش الكلمات لحروف رأسية داخل السايدبار */
-    section[data-testid="stSidebar"] * {
-        word-break: normal !important;
-        overflow-wrap: normal !important;
+
+    /* 2. محاذاة العناوين والنصوص لليمين */
+    h1, h2, h3, h4, h5, h6, p, label, .stMarkdown {
+        text-align: right !important;
+        direction: rtl !important;
     }
 
-    div[data-testid="metric-container"] {
-        background-color: #1e293b;
-        border: 1px solid #334155;
-        padding: 15px;
-        border-radius: 10px;
-        white-space: nowrap;
+    /* 3. محاذاة عناصر القائمة الجانبية (Sidebar) */
+    section[data-testid="stSidebar"] {
         direction: rtl;
         text-align: right;
     }
-    div[data-testid="metric-container"] label {
-        font-size: 0.9rem !important;
+    section[data-testid="stSidebar"] * {
+        text-align: right !important;
     }
+
+    /* إخفاء السايدبار عند الإغلاق بدون ترك بقايا نصية */
+    section[data-testid="stSidebar"][aria-expanded="false"] {
+        display: none !important;
+    }
+
+    /* 4. تصميم بطاقات المؤشرات الرقمية النظيفة */
+    .metric-card {
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        padding: 14px 18px;
+        border-radius: 12px;
+        text-align: right;
+        direction: rtl;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .metric-title {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .metric-value-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        direction: rtl;
+    }
+    .metric-value {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #f8fafc;
+        direction: ltr; /* لضمان عدم انقلاب الأرقام والوحدات */
+        display: inline-block;
+    }
+
+    /* 5. تنسيق التوجيهات والقوائم */
     .custom-bullet {
-        margin-bottom: 8px;
-        font-size: 1rem;
+        margin-bottom: 10px;
+        font-size: 0.95rem;
         line-height: 1.6;
         direction: rtl;
         text-align: right;
+    }
+    .vulnerable-pill {
+        display: inline-block;
+        background-color: #334155;
+        color: #f8fafc;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        margin: 3px 2px;
+        direction: rtl;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -119,11 +154,9 @@ calculated_risk = guidance["calculated_risk"]
 st.title(f"منظومة التنبؤ بالأثر الصحي - {selected_city}")
 st.caption(f"المنطقة الفرعية: {city_base['zone_name']} | حالة المعالجة: {ai_status_badge}")
 
-# 6. بطاقات المؤشرات النظيفة بصرياً
 # 6. بطاقات المؤشرات النظيفة والمصممة خصيصاً للتغلب على مشاكل الاتجاه والألوان
 col1, col2, col3, col4 = st.columns(4)
 
-# قاموس ألوان الشارات حسب مستوى الخطر
 risk_badge_colors = {
     "CRITICAL": "#dc2626",  # أحمر ناصع
     "HIGH":     "#ea580c",  # برتقالي
@@ -134,9 +167,9 @@ badge_color = risk_badge_colors.get(calculated_risk, "#16a34a")
 
 with col1:
     st.markdown(f"""
-        <div style="background-color: #1e293b; border: 1px solid #334155; padding: 14px; border-radius: 10px;">
-            <div style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">درجة الحرارة</div>
-            <div style="font-size: 1.6rem; font-weight: bold; color: #f8fafc; margin-top: 4px; direction: ltr; text-align: right;">
+        <div class="metric-card">
+            <div class="metric-title">درجة الحرارة</div>
+            <div class="metric-value" style="text-align: right; width: 100%;">
                 {temp_input} <span style="font-size: 1rem; color: #94a3b8;">°م</span>
             </div>
         </div>
@@ -144,9 +177,9 @@ with col1:
 
 with col2:
     st.markdown(f"""
-        <div style="background-color: #1e293b; border: 1px solid #334155; padding: 14px; border-radius: 10px;">
-            <div style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">تركيز الغبار (PM10)</div>
-            <div style="font-size: 1.6rem; font-weight: bold; color: #f8fafc; margin-top: 4px; direction: ltr; text-align: right;">
+        <div class="metric-card">
+            <div class="metric-title">تركيز الغبار (PM10)</div>
+            <div class="metric-value" style="text-align: right; width: 100%;">
                 {pm10_input} <span style="font-size: 0.9rem; color: #94a3b8;">µg/m³</span>
             </div>
         </div>
@@ -154,10 +187,10 @@ with col2:
 
 with col3:
     st.markdown(f"""
-        <div style="background-color: #1e293b; border: 1px solid #334155; padding: 14px; border-radius: 10px;">
-            <div style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">مؤشر الخطر الصحي (PHRI)</div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
-                <span style="font-size: 1.6rem; font-weight: bold; color: #f8fafc; direction: ltr;">
+        <div class="metric-card">
+            <div class="metric-title">مؤشر الخطر الصحي (PHRI)</div>
+            <div class="metric-value-container">
+                <span class="metric-value">
                     {calculated_phri} <span style="font-size: 0.95rem; color: #64748b;">/ 100</span>
                 </span>
                 <span style="background-color: {badge_color}; color: #ffffff; padding: 3px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; letter-spacing: 0.5px;">
@@ -169,13 +202,15 @@ with col3:
 
 with col4:
     st.markdown(f"""
-        <div style="background-color: #1e293b; border: 1px solid #334155; padding: 14px; border-radius: 10px;">
-            <div style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">ضغط الطوارئ المتوقع</div>
-            <div style="font-size: 1.6rem; font-weight: bold; color: #f8fafc; margin-top: 4px; direction: ltr; text-align: right;">
+        <div class="metric-card">
+            <div class="metric-title">ضغط الطوارئ المتوقع</div>
+            <div class="metric-value" style="text-align: right; width: 100%;">
                 +{calculated_surge}%
             </div>
         </div>
     """, unsafe_allow_html=True)
+
+st.divider()
 
 # 7. الخريطة والرسوم البيانية
 col_map, col_chart = st.columns([1, 1])
@@ -207,7 +242,7 @@ with col_chart:
 
 st.divider()
 
-# 8. قسم التوجيهات الميدانية والطبية بدون نقاط مزدوجة
+# 8. قسم التوجيهات الميدانية والطبية
 st.subheader("🤖 توجيهات غرف القيادة والتحكم الميدانية")
 
 st.warning(guidance["summary"])
@@ -223,5 +258,6 @@ with col_field:
     st.markdown("### 🚑 التنبيهات الميدانية والجهات الخارجية:")
     st.markdown(f"**إجراء السلامة المهنية:** {guidance['field_advisory']}")
     st.markdown("**الفئات المعرضة للخطر في هذا السيناريو:**")
-    for group in guidance["vulnerable_groups"]:
-        st.badge(group)
+    
+    pills_html = "".join([f"<span class='vulnerable-pill'>{group}</span>" for group in guidance["vulnerable_groups"]])
+    st.markdown(f"<div style='margin-top: 8px;'>{pills_html}</div>", unsafe_allow_html=True)
